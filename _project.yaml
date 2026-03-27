@@ -1,0 +1,9 @@
+name: qgis
+title: QGIS空间处理
+description: 基于 QGIS 的空间数据处理 Shell Pipeline 工具
+type: hydraulic
+icon: "\U0001F310"
+status: active
+entry:
+  cli: scripts/run_pipeline.sh
+tags: [QGIS, 空间分析, GIS, Pipeline]
