@@ -9,7 +9,7 @@
 
 ---
 
-![hydro-qgis demo](docs/screenshots/demo.svg)
+![hydro-qgis demo](docs/screenshots/demo.png)
 
 ---
 
