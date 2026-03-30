@@ -1,47 +1,47 @@
-        # hydro-qgis
+# hydro-qgis
 
-        **English** | [中文](README_CN.md)
+**English** | [中文](README_CN.md)
 
-        13-step QGIS pipeline for hydraulic engineering GIS tasks — cross-sections, dike clipping, spatial processing.
+13-step QGIS pipeline for hydraulic engineering GIS tasks — cross-sections, dike clipping, spatial processing.
 
-        [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-yellow?style=for-the-badge)](https://python.org)
-        [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-yellow?style=for-the-badge)](https://python.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-        ---
+---
 
-        ![hydro-qgis demo](docs/screenshots/demo.svg)
+![hydro-qgis demo](docs/screenshots/demo.svg)
 
-        ---
+---
 
-        ## What can hydro-qgis do?
+## What can hydro-qgis do?
 
-        | Feature | Description |
-        |---------|-------------|
-        | **River cross-section generation** | Automatically generate cross-section lines from centerline and DEM |
+| Feature | Description |
+|---------|-------------|
+| **River cross-section generation** | Automatically generate cross-section lines from centerline and DEM |
 | **Dike / levee clipping** | Clip spatial features along dike alignments |
 | **13-step numbered pipeline** | Sequential scripts, each independently runnable |
 | **Utility library** | Reusable hydraulic-specific QGIS helper functions |
 | **Shell orchestration** | Run full pipeline or individual steps via shell scripts |
 
-        ## Install
+## Install
 
-        ```bash
-        git clone https://github.com/zengtianli/hydro-qgis.git
+```bash
+git clone https://github.com/zengtianli/hydro-qgis.git
 cd hydro-qgis
 pip install -r requirements.txt
-        ```
+```
 
-        ## Quick Start
+## Quick Start
 
-        ```bash
-        streamlit run app.py
-        ```
+```bash
+streamlit run app.py
+```
 
-        ## Requirements
+## Requirements
 
-        - Python 3.9+
-        - See requirements.txt
+- Python 3.9+
+- See requirements.txt
 
-        ## License
+## License
 
-        MIT
+MIT
