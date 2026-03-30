@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="321" viewBox="0 0 720 321">
+  <rect width="720" height="321" rx="10" fill="#1e1e2e"/>
+  <rect width="720" height="36" rx="10" fill="#313244"/>
+  <rect y="18" width="720" height="18" fill="#313244"/>
+  <circle cx="18" cy="18" r="6" fill="#f38ba8"/>
+  <circle cx="38" cy="18" r="6" fill="#f9e2af"/>
+  <circle cx="58" cy="18" r="6" fill="#a6e3a1"/>
+  <text x="360" y="23" text-anchor="middle" font-family="SF Mono,monospace" font-size="12" fill="#6c7086">hydro-qgis pipeline</text>
+  <text x="20" y="75" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#89b4fa">❯</text>
+  <text x="36" y="75" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#cdd6f4">python 01_generate_river_points.py</text>
+  <text x="20" y="99" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#a6e3a1">  ✓ River centerline points generated (1,240 pts)</text>
+  <text x="20" y="123" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#89b4fa">❯</text>
+  <text x="36" y="123" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#cdd6f4">python 05_generate_cross_sections.py</text>
+  <text x="20" y="147" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#a6e3a1">  ✓ Cross sections created: 248 lines</text>
+  <text x="20" y="171" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#89b4fa">❯</text>
+  <text x="36" y="171" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#cdd6f4">python 09_clip_dike_features.py</text>
+  <text x="20" y="195" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#a6e3a1">  ✓ Dike features clipped to study area</text>
+  <text x="20" y="219" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#89b4fa">❯</text>
+  <text x="36" y="219" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#cdd6f4">python 13_export_results.py</text>
+  <text x="20" y="243" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#a6e3a1">  ✓ GeoJSON + SHP exported to ./output/</text>
+  <text x="20" y="267" font-family="SF Mono,Fira Code,monospace" font-size="13" fill="#89b4fa">  Pipeline complete.</text>
+
+</svg>

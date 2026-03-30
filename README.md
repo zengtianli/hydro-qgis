@@ -1,18 +1,47 @@
-# Hydro QGIS
+        # hydro-qgis
 
-水利 QGIS 空间处理管线 — 河流断面生成、堤防裁剪、GIS 数据处理
+        **English** | [中文](README_CN.md)
 
-## Structure
+        13-step QGIS pipeline for hydraulic engineering GIS tasks — cross-sections, dike clipping, spatial processing.
 
-- `pipeline/` — 编号式处理步骤（01-13）
-- `tools/` — 独立工具脚本
-- `_util/` — 通用工具函数
-- `scripts/` — Shell 编排脚本
-- `lib/hydraulic/` — 水利编码与 QGIS 配置
+        [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-yellow?style=for-the-badge)](https://python.org)
+        [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-## Usage
+        ---
 
-```bash
+        ![hydro-qgis demo](docs/screenshots/demo.svg)
+
+        ---
+
+        ## What can hydro-qgis do?
+
+        | Feature | Description |
+        |---------|-------------|
+        | **River cross-section generation** | Automatically generate cross-section lines from centerline and DEM |
+| **Dike / levee clipping** | Clip spatial features along dike alignments |
+| **13-step numbered pipeline** | Sequential scripts, each independently runnable |
+| **Utility library** | Reusable hydraulic-specific QGIS helper functions |
+| **Shell orchestration** | Run full pipeline or individual steps via shell scripts |
+
+        ## Install
+
+        ```bash
+        git clone https://github.com/zengtianli/hydro-qgis.git
+cd hydro-qgis
 pip install -r requirements.txt
-python pipeline/01_generate_river_points.py
-```
+        ```
+
+        ## Quick Start
+
+        ```bash
+        streamlit run app.py
+        ```
+
+        ## Requirements
+
+        - Python 3.9+
+        - See requirements.txt
+
+        ## License
+
+        MIT
