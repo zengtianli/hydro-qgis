@@ -12,7 +12,7 @@ set -e  # 遇到错误立即退出
 
 # ============ 配置区 ============
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../pipeline" && pwd)"
-DEFAULT_PROJECT="${QGIS_DEFAULT_PROJECT:-$HOME/Downloads/zdwp/2025风险图/熟溪/shuxi.qgz}"
+DEFAULT_PROJECT="${QGIS_DEFAULT_PROJECT:-$HOME/Work/zdwp/projects/risk-map/熟溪/shuxi.qgz}"
 QGIS_BIN="/Applications/QGIS.app/Contents/MacOS/QGIS"
 
 # ============ 参数解析 ============

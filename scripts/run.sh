@@ -1,5 +1,5 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../pipeline" && pwd)"
-PROJECT_FILE="${QGIS_DEFAULT_PROJECT:-$HOME/Downloads/zdwp/2025风险图/熟溪/shuxi.qgz}"
+PROJECT_FILE="${QGIS_DEFAULT_PROJECT:-$HOME/Work/zdwp/projects/risk-map/熟溪/shuxi.qgz}"
 
 cd "$SCRIPT_DIR" && \
 PYTHONPATH="${SCRIPT_DIR}:${PYTHONPATH}" \

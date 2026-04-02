@@ -53,7 +53,7 @@ LAYER_NAMES = [
 OUTPUT_FORMAT = 'GeoJSON'  # 可选: 'GeoJSON', 'ESRI Shapefile', 'GPKG'
 
 # 输出目录（相对于当前工作目录或绝对路径）
-OUTPUT_DIR = str(Path.home() / 'Downloads/zdwp/2025风险图/exported_layers/final/')
+OUTPUT_DIR = str(Path.home() / 'Work/zdwp/projects/risk-map/exported_layers/final/')
 
 # 目标坐标系（可选）
 TARGET_CRS = None  # 例如: 'EPSG:4326', 'EPSG:4549', None表示保持原坐标系
@@ -517,5 +517,5 @@ exec(open('/path/to/99_batch_export_layers.py').read())
 EXPORT_BY_GROUP = True
 GROUP_NAME = 'final'
 OUTPUT_FORMAT = 'GeoJSON'
-OUTPUT_DIR = str(Path.home() / 'Downloads/zdwp/2025风险图/final_export')
+OUTPUT_DIR = str(Path.home() / 'Work/zdwp/projects/risk-map/final_export')
 """
