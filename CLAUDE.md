@@ -4,7 +4,7 @@
 
 | 项目 | 路径/值 |
 |------|---------|
-| 项目根 | `/Users/tianli/Dev/hydro-qgis/` |
+| 项目根 | `/Users/tianli/Dev/labs/hydro-qgis/` |
 | Web 入口 | `app.py` (Streamlit) |
 | Pipeline 脚本 | `pipeline/01_*.py` → `pipeline/13_*.py` |
 | 批量工具 | `pipeline/99_batch_export_layers.py` |
@@ -14,7 +14,7 @@
 ## 常用命令
 
 ```bash
-cd /Users/tianli/Dev/hydro-qgis
+cd /Users/tianli/Dev/labs/hydro-qgis
 
 # 启动 Web UI
 streamlit run app.py
@@ -54,7 +54,7 @@ pipeline/   # 13 步有序脚本，可独立运行
 tools/      # 独立实用工具（导出、过滤、掩膜等）
 _util/      # 公共库：qgis_util.py + listener
 scripts/    # Shell 编排入口
-lib/        # 水利领域公共模块（链接自 ~/Dev/scripts/lib/hydraulic）
+lib/        # 水利领域公共模块（链接自 ~/Dev/devtools/scripts/lib/hydraulic）
 docs/       # 截图文档
 ```
 
