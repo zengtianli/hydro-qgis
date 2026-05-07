@@ -6,7 +6,7 @@
 
 | 项目 | 路径/值 |
 |------|---------|
-| 项目根 | `/Users/tianli/Dev/labs/hydro-qgis/` |
+| 项目根 | `/Users/tianli/Dev/tools/hydro-qgis/` |
 | Python | `>=3.12`（实际锁 `.python-version=3.13`）+ uv 管理（已弃 conda/miniforge，迁移于 `4e1f895`） |
 | 入口（运行时） | `QGIS.app --code pipeline/NN_*.py` 由 shell 编排（**非 streamlit**） |
 | Pipeline 脚本 | `pipeline/01_*.py` … `pipeline/13_*.py` + `99_batch_export_layers.py` |
@@ -18,7 +18,7 @@
 ## 常用命令
 
 ```bash
-cd ~/Dev/labs/hydro-qgis
+cd ~/Dev/tools/hydro-qgis
 
 # 全流程（QGIS 进程内执行所有 pipeline）
 bash scripts/run_pipeline.sh           # 全部

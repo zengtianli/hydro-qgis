@@ -26,7 +26,7 @@ def _setup_paths():
     """设置模块搜索路径，兼容QGIS控制台和命令行执行"""
     known_paths = [
         Path(__file__).resolve().parent.parent if '__file__' in dir() else None,
-        Path.home() / 'Dev/labs/hydro-qgis',
+        Path.home() / 'Dev/tools/hydro-qgis',
     ]
 
     script_dir = None
