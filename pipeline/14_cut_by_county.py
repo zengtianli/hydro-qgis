@@ -88,10 +88,12 @@ from qgis_util import (
 
 from hydraulic.qgis_config import (
     COUNTY_SLICE_SOURCES,
+    COUNTY_SLICE_CITY_OVERRIDES,
     COUNTY_SLICE_OUTPUT_CRS,
     COUNTY_SLICE_MASK_SOURCE,
     COUNTY_SLICE_MASK_FILTER,
 )
+from hydraulic.config import get_city_from_county
 
 
 # ============ 工具函数 ============
@@ -270,9 +272,20 @@ def main():
 
     county_short = derive_short_county(county_name)
 
+    # 解析所属市 → 选择源配置（city-override 命中则整体替换）
+    city = get_city_from_county(county_name) or ""
+    if city in COUNTY_SLICE_CITY_OVERRIDES:
+        effective_sources = COUNTY_SLICE_CITY_OVERRIDES[city]
+        source_mode = f"city-override [{city}]"
+    else:
+        effective_sources = COUNTY_SLICE_SOURCES
+        source_mode = "default (全省 5 类源)"
+
     print_info(f"县名: {county_name} (短名: {county_short})", indent=1)
+    print_info(f"所属市: {city or '?'} → 源模式: {source_mode}", indent=1)
     print_info(f"输出目录: {output_dir}", indent=1)
     print_info(f"输出 CRS: {COUNTY_SLICE_OUTPUT_CRS}", indent=1)
+    print_info(f"待切要素: {list(effective_sources.keys())}", indent=1)
 
     # 1. 构建县 mask（spatial_clip 用）
     print_step("MASK", "构建县级 mask polygon")
@@ -280,9 +293,9 @@ def main():
     if mask_layer is None:
         print_error("mask 构建失败，spatial_clip 类要素将跳过")
 
-    # 2. 遍历 5 类要素
+    # 2. 遍历有效要素（默认 5 类 / city-override 时按城市表）
     results = {}
-    for name, cfg in COUNTY_SLICE_SOURCES.items():
+    for name, cfg in effective_sources.items():
         try:
             results[name] = process_one(
                 name, cfg, county_name, county_short, output_dir, mask_layer

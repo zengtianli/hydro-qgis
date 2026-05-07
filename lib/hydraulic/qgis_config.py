@@ -237,6 +237,63 @@ COUNTY_SLICE_OUTPUT_ROOT = f"{RESOURCES_GIS_ROOT}/derived/county-slices"  # 默�
 COUNTY_SLICE_MASK_SOURCE = f"{RESOURCES_GIS_RAW}/boundaries/行政境界（乡镇）.shp"
 COUNTY_SLICE_MASK_FILTER = "fullname LIKE '%{county}%'"  # 用于生成县 mask
 
+# 城市级源覆盖（city-mode）：当全省源不足以表达某城市时用城市级 GDB 整体替换
+# pipeline 14 按 get_city_from_county(county_name) 查表，命中即替换 COUNTY_SLICE_SOURCES
+COUNTY_SLICE_CITY_OVERRIDES = {
+    "台州市": {
+        "县界": {
+            "source": f"{RESOURCES_GIS_RAW}/boundaries/行政境界（乡镇）.shp",
+            "source_crs": "EPSG:4490",
+            "method": "attr_filter",
+            # 用 short + 三后缀 OR 容忍 boundaries shp 的撤县设市滞后（玉环县 vs 玉环市）
+            "attr_filter": "fullname LIKE '%{county_short}市%' OR fullname LIKE '%{county_short}县%' OR fullname LIKE '%{county_short}区%'",
+            "geom_type": "Polygon",
+        },
+        "河道": {
+            "source": f"{RESOURCES_GIS_RAW}/hydrography/台州市.gdb|layername=RVAA",
+            "source_crs": "EPSG:4528",
+            "method": "attr_filter",
+            "attr_filter": "COUNTY LIKE '%{county}%'",
+            "geom_type": "Polygon",
+        },
+        "湖泊": {
+            "source": f"{RESOURCES_GIS_RAW}/hydrography/台州市.gdb|layername=LKAA",
+            "source_crs": "EPSG:4528",
+            "method": "attr_filter",
+            "attr_filter": "COUNTY LIKE '%{county}%'",
+            "geom_type": "Polygon",
+        },
+        "水库": {
+            "source": f"{RESOURCES_GIS_RAW}/hydrography/台州市.gdb|layername=RSAA",
+            "source_crs": "EPSG:4528",
+            "method": "attr_filter",
+            "attr_filter": "COUNTY LIKE '%{county}%'",
+            "geom_type": "Polygon",
+        },
+        "山塘": {
+            "source": f"{RESOURCES_GIS_RAW}/hydrography/台州市.gdb|layername=HPAA",
+            "source_crs": "EPSG:4528",
+            "method": "attr_filter",
+            "attr_filter": "COUNTY LIKE '%{county}%'",
+            "geom_type": "Polygon",
+        },
+        "渠道": {
+            "source": f"{RESOURCES_GIS_RAW}/hydrography/台州市.gdb|layername=ACAA",
+            "source_crs": "EPSG:4528",
+            "method": "attr_filter",
+            "attr_filter": "COUNTY LIKE '%{county}%'",
+            "geom_type": "Polygon",
+        },
+        "海域": {
+            "source": f"{RESOURCES_GIS_RAW}/hydrography/台州市.gdb|layername=OWAA",
+            "source_crs": "EPSG:4528",
+            "method": "attr_filter",
+            "attr_filter": "COUNTY LIKE '%{county}%'",
+            "geom_type": "Polygon",
+        },
+    },
+}
+
 
 # 重新导出供 qgis 脚本使用
 __all__ = [
