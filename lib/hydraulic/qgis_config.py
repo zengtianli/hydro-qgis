@@ -189,39 +189,42 @@ except ImportError:
 get_river_code = None  # 使用 hydraulic.code_utils.get_river_code 代替
 
 # ============================================================
-# 县级切片配置（resources 仓库消费）
+# 县级切片配置（resources/gis 4 段式仓库消费）
+# 路径 SSOT 同步：~/Dev/paths.yaml 的 gis_raw_* 条目
+# 仓库结构 v2 (2026-05-06)：raw/<theme>/ + derived/county-slices/
 # ============================================================
 RESOURCES_GIS_ROOT = "/Users/tianli/Dev/Work/resources/gis"
+RESOURCES_GIS_RAW = f"{RESOURCES_GIS_ROOT}/raw"
 
 COUNTY_SLICE_SOURCES = {
     "县界": {
-        "source": f"{RESOURCES_GIS_ROOT}/行政边界乡镇/行政境界（乡镇）.shp",
+        "source": f"{RESOURCES_GIS_RAW}/boundaries/行政境界（乡镇）.shp",
         "source_crs": "EPSG:4490",
         "method": "attr_filter",
         "attr_filter": "fullname LIKE '%{county}%'",
         "geom_type": "Polygon",
     },
     "河流": {
-        "source": f"{RESOURCES_GIS_ROOT}/专题数据/生态流量/河流手册_865最终.shp",
+        "source": f"{RESOURCES_GIS_RAW}/hydrography/河流手册_865最终.shp",
         "source_crs": "EPSG:4490",
         "method": "spatial_clip",  # 用县 mask 相交
         "geom_type": "Polygon",
     },
     "水库点": {
-        "source": f"{RESOURCES_GIS_ROOT}/水利要素/水库/全省水库.geojson",
+        "source": f"{RESOURCES_GIS_RAW}/reservoirs/全省水库.geojson",
         "source_crs": "EPSG:4549",
         "method": "attr_filter",
         "attr_filter": "SZX LIKE '%{county_short}%'",  # SZX 字段不带"县"字
         "geom_type": "Point",
     },
     "大中型水库": {
-        "source": f"{RESOURCES_GIS_ROOT}/shapefile/全省水库点/大中型水库.shp",
+        "source": f"{RESOURCES_GIS_RAW}/reservoirs/大中型水库.shp",
         "source_crs": "EPSG:4549",
         "method": "spatial_clip",
         "geom_type": "Point",
     },
     "小水电": {
-        "source": f"{RESOURCES_GIS_ROOT}/小水电/小水电.geojson",
+        "source": f"{RESOURCES_GIS_RAW}/hydropower-stations/小水电.geojson",
         "source_crs": "EPSG:4326",
         "method": "attr_filter",
         "attr_filter": "SZX LIKE '%{county_short}%'",
@@ -230,7 +233,8 @@ COUNTY_SLICE_SOURCES = {
 }
 
 COUNTY_SLICE_OUTPUT_CRS = "EPSG:4326"  # 给 QGIS + 天地图底图用
-COUNTY_SLICE_MASK_SOURCE = f"{RESOURCES_GIS_ROOT}/行政边界乡镇/行政境界（乡镇）.shp"
+COUNTY_SLICE_OUTPUT_ROOT = f"{RESOURCES_GIS_ROOT}/derived/county-slices"  # 默认输出根
+COUNTY_SLICE_MASK_SOURCE = f"{RESOURCES_GIS_RAW}/boundaries/行政境界（乡镇）.shp"
 COUNTY_SLICE_MASK_FILTER = "fullname LIKE '%{county}%'"  # 用于生成县 mask
 
 
