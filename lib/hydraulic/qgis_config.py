@@ -188,6 +188,52 @@ except ImportError:
 
 get_river_code = None  # 使用 hydraulic.code_utils.get_river_code 代替
 
+# ============================================================
+# 县级切片配置（resources 仓库消费）
+# ============================================================
+RESOURCES_GIS_ROOT = "/Users/tianli/Dev/Work/resources/gis"
+
+COUNTY_SLICE_SOURCES = {
+    "县界": {
+        "source": f"{RESOURCES_GIS_ROOT}/行政边界乡镇/行政境界（乡镇）.shp",
+        "source_crs": "EPSG:4490",
+        "method": "attr_filter",
+        "attr_filter": "fullname LIKE '%{county}%'",
+        "geom_type": "Polygon",
+    },
+    "河流": {
+        "source": f"{RESOURCES_GIS_ROOT}/专题数据/生态流量/河流手册_865最终.shp",
+        "source_crs": "EPSG:4490",
+        "method": "spatial_clip",  # 用县 mask 相交
+        "geom_type": "Polygon",
+    },
+    "水库点": {
+        "source": f"{RESOURCES_GIS_ROOT}/水利要素/水库/全省水库.geojson",
+        "source_crs": "EPSG:4549",
+        "method": "attr_filter",
+        "attr_filter": "SZX LIKE '%{county_short}%'",  # SZX 字段不带"县"字
+        "geom_type": "Point",
+    },
+    "大中型水库": {
+        "source": f"{RESOURCES_GIS_ROOT}/shapefile/全省水库点/大中型水库.shp",
+        "source_crs": "EPSG:4549",
+        "method": "spatial_clip",
+        "geom_type": "Point",
+    },
+    "小水电": {
+        "source": f"{RESOURCES_GIS_ROOT}/小水电/小水电.geojson",
+        "source_crs": "EPSG:4326",
+        "method": "attr_filter",
+        "attr_filter": "SZX LIKE '%{county_short}%'",
+        "geom_type": "Point",
+    },
+}
+
+COUNTY_SLICE_OUTPUT_CRS = "EPSG:4326"  # 给 QGIS + 天地图底图用
+COUNTY_SLICE_MASK_SOURCE = f"{RESOURCES_GIS_ROOT}/行政边界乡镇/行政境界（乡镇）.shp"
+COUNTY_SLICE_MASK_FILTER = "fullname LIKE '%{county}%'"  # 用于生成县 mask
+
+
 # 重新导出供 qgis 脚本使用
 __all__ = [
     'RIVER_CODE_MAPPING', 'RIVER_NAME_TO_CODE', 'CHINESE_TO_PINYIN',
