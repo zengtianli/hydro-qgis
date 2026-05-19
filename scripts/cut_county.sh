@@ -4,7 +4,7 @@
 # 用法: bash scripts/cut_county.sh <县名> <输出目录>
 #
 # 示例:
-#   bash scripts/cut_county.sh 天台县 /Users/tianli/Dev/Work/resources/gis/derived/county-slices/台州市/天台县
+#   bash scripts/cut_county.sh 天台县 /Users/tianli/Dev/Work/shared/resources/gis/derived/county-slices/台州市/天台县
 #   bash scripts/cut_county.sh 余杭区 /tmp/yuhang_test
 #
 
@@ -35,7 +35,7 @@ if [ -z "$1" ] || [ -z "$2" ]; then
 用法: $0 <县名> <输出目录>
 
 示例:
-  $0 天台县 /Users/tianli/Dev/Work/resources/gis/derived/county-slices/台州市/天台县
+  $0 天台县 /Users/tianli/Dev/Work/shared/resources/gis/derived/county-slices/台州市/天台县
   $0 余杭区 /tmp/yuhang_test
 
 输出 5 个 geojson:

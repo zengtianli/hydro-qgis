@@ -9,7 +9,7 @@
 
 环境变量:
     COUNTY_NAME: 完整县名（如 "天台县"）
-    OUTPUT_DIR:  输出目录（如 /Users/tianli/Dev/Work/resources/gis/derived/county-slices/台州市/天台县）
+    OUTPUT_DIR:  输出目录（如 /Users/tianli/Dev/Work/shared/resources/gis/derived/county-slices/台州市/天台县）
 
 输出 5 个文件:
     县界.geojson / 河流.geojson / 水库点.geojson / 大中型水库.geojson / 小水电.geojson
