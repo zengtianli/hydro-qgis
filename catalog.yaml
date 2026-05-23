@@ -1,0 +1,10 @@
+# catalog.yaml — 模块 SSOT(认知单位,仿 Backstage catalog-info.yaml)
+name: hydro-qgis
+domain: hydro
+function: 让我在 QGIS 里跑水利空间分析管线(河道点位生成、空间工具、空间库),处理风险图/灌区等地理数据
+public_api: hydro-qgis pipeline
+key_scripts: [qgis_config.py, 01_generate_river_points.py, qgis_util.py]
+depends_on: [hydro-irrigation, downloads-organizer, tianditu-tools, cc-harness, hydro-district, audiobook, hydro-risk]
+tier: CORE
+owner: tianli
+docs: ./README.md
