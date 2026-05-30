@@ -193,7 +193,7 @@ get_river_code = None  # 使用 hydraulic.code_utils.get_river_code 代替
 # 路径 SSOT 同步：~/Dev/paths.yaml 的 gis_raw_* 条目
 # 仓库结构 v2 (2026-05-06)：raw/<theme>/ + derived/county-slices/
 # ============================================================
-RESOURCES_GIS_ROOT = "/Users/tianli/Dev/Work/shared/resources/gis"
+RESOURCES_GIS_ROOT = "/Users/tianli/Work/shared/resources/gis"
 RESOURCES_GIS_RAW = f"{RESOURCES_GIS_ROOT}/raw"
 
 COUNTY_SLICE_SOURCES = {
