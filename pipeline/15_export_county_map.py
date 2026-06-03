@@ -77,17 +77,16 @@ def _tianditu_token() -> str:
     return ""
 
 
-def fit_to_aspect(bbox, margin: float = MASK_MARGIN_M):
-    """县 bbox + margin → 撑成 A4 纵向页面比例（地图满版不变形）。返回 (xmin,ymin,xmax,ymax)。"""
+def fit_to_aspect(bbox, aspect: float, margin: float = MASK_MARGIN_M):
+    """县 bbox + margin → 撑成指定页面宽高比 aspect(=w/h)（地图满版不变形）。返回 (xmin,ymin,xmax,ymax)。"""
     xmin, ymin, xmax, ymax = bbox
     xmin -= margin; ymin -= margin; xmax += margin; ymax += margin
     w, h = xmax - xmin, ymax - ymin
     cx, cy = (xmin + xmax) / 2, (ymin + ymax) / 2
-    target = PAGE_W / PAGE_H            # 0.707
-    if w / h > target:                 # 太宽 → 撑高
-        h = w / target
+    if w / h > aspect:                 # 太宽 → 撑高
+        h = w / aspect
     else:                              # 太高 → 撑宽
-        w = h * target
+        w = h * aspect
     return (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
 
 
@@ -206,10 +205,15 @@ def prep_layers(county: str, work: Path, approved_names: list | None = None) -> 
             print(f"    ⚠ 核定水库命中 {n_ap}/{len(approved_names)}（核对名是否与 SSOT GCMC 一致）")
         out["approved"] = ap if n_ap > 0 else None
 
-    # ⑥ 天地图影像底图（撑成 A4 页面比例的 bbox，与出图范围严格一致）
-    fbbox = fit_to_aspect(layer_extent(out["county"]))
-    out["extent"] = fbbox
-    out["basemap"] = fetch_basemap(fbbox, work)
+    # ⑥ 双版面出图范围（竖 0.707 / 横 1.414）+ 天地图影像（抓两者并集，一次覆盖两版）
+    cbbox = layer_extent(out["county"])
+    ext_p = fit_to_aspect(cbbox, PAGE_W / PAGE_H)   # 竖
+    ext_l = fit_to_aspect(cbbox, PAGE_H / PAGE_W)   # 横
+    out["extent_portrait"] = ext_p
+    out["extent_landscape"] = ext_l
+    union = (min(ext_p[0], ext_l[0]), min(ext_p[1], ext_l[1]),
+             max(ext_p[2], ext_l[2]), max(ext_p[3], ext_l[3]))
+    out["basemap"] = fetch_basemap(union, work)
 
     print(f"[prep] ✓ 县界1 / 水库{feature_count(out['reservoirs'])} / "
           f"河流{feature_count(out['rivers'])} / 蒙版1 / "
@@ -221,6 +225,7 @@ def prep_layers(county: str, work: Path, approved_names: list | None = None) -> 
 # ============ B 段: render（PyQGIS headless）============
 def render(county: str, layers: dict, hillshade: Path, out_png: Path,
            fig_no: str = "2", dem: Path | None = None):
+    """一次 QGIS 会话出【竖 + 横】两版（out_png 派生 _竖/_横 后缀）。"""
     # —— QGIS bundle 环境（proj.db 必须先于 initQgis 设好，否则 EPSG:4549 不解析、矢量层全废）——
     prefix = os.environ.get("QGIS_PREFIX_PATH") or _detect_qgis_prefix()
     _res = os.path.join(os.path.dirname(prefix), "Resources", "qgis")
@@ -346,94 +351,95 @@ def render(county: str, layers: dict, hillshade: Path, out_png: Path,
         for lyr in draw:
             root.addLayer(lyr)
 
-        # —— 地图范围 = prep 算好的 A4 比例 bbox（与天地图影像严格对齐）——
-        fb = layers.get("extent")
-        if fb:
-            ext = QgsRectangle(fb[0], fb[1], fb[2], fb[3])
-        else:
-            ext = county_l.extent()
-            ext.grow(MASK_MARGIN_M)
+        # —— 双版面：竖(0.707) + 横(1.414)，各出一张，满版 A4 ——
+        # 版式：左上指北针 / 左下4项图例 / 右下比例尺 / 无标题(Word 当图注)。位置随页宽高 pw/ph 自适应。
+        def build_and_export(orientation: str, suffix: str):
+            landscape = (orientation == "landscape")
+            pw, ph = (PAGE_H, PAGE_W) if landscape else (PAGE_W, PAGE_H)
+            fb = layers.get("extent_landscape" if landscape else "extent_portrait")
+            if fb:
+                ext = QgsRectangle(fb[0], fb[1], fb[2], fb[3])
+            else:
+                ext = county_l.extent()
+                ext.grow(MASK_MARGIN_M)
 
-        # —— 布局：满版 A4 + 左上指北针 + 左下图例(4项) + 右下比例尺（复刻用户最终模板）——
-        # 标题不入图（用户在 Word 里当图注加）；要标题加 --with-title
-        layout = QgsPrintLayout(proj)
-        layout.initializeDefaults()
-        layout.pageCollection().page(0).setPageSize(
-            QgsLayoutSize(210, 297, QgsUnitTypes.LayoutMillimeters))
+            layout = QgsPrintLayout(proj)
+            layout.initializeDefaults()
+            layout.pageCollection().page(0).setPageSize(
+                QgsLayoutSize(pw, ph, QgsUnitTypes.LayoutMillimeters))
 
-        m = QgsLayoutItemMap(layout)
-        m.attemptMove(QgsLayoutPoint(0, 0, QgsUnitTypes.LayoutMillimeters))
-        m.attemptResize(QgsLayoutSize(210, 297, QgsUnitTypes.LayoutMillimeters))  # 满版出血
-        m.setCrs(QgsCoordinateReferenceSystem(WORK_CRS))
-        m.zoomToExtent(ext)
-        m.setFrameEnabled(False)
-        m.setKeepLayerSet(True)
-        m.setLayers(draw)
-        layout.addLayoutItem(m)
+            m = QgsLayoutItemMap(layout)
+            m.attemptMove(QgsLayoutPoint(0, 0, QgsUnitTypes.LayoutMillimeters))
+            m.attemptResize(QgsLayoutSize(pw, ph, QgsUnitTypes.LayoutMillimeters))  # 满版出血
+            m.setCrs(QgsCoordinateReferenceSystem(WORK_CRS))
+            m.setExtent(ext)
+            m.setFrameEnabled(False)
+            m.setKeepLayerSet(True)
+            m.setLayers(draw)
+            layout.addLayoutItem(m)
 
-        # 比例尺 右下（0 2.5 5 7.5 10 12.5 km 风格）
-        sb = QgsLayoutItemScaleBar(layout)
-        sb.setStyle("Single Box")
-        sb.setLinkedMap(m)
-        sb.setUnits(QgsUnitTypes.DistanceKilometers)
-        sb.setUnitsPerSegment(2.5)
-        sb.setNumberOfSegments(5)
-        sb.setNumberOfSegmentsLeft(0)
-        sb.setUnitLabel("km")
-        sb.update()
-        sb.attemptMove(QgsLayoutPoint(140, 283, QgsUnitTypes.LayoutMillimeters))
-        layout.addLayoutItem(sb)
+            sb = QgsLayoutItemScaleBar(layout)         # 比例尺 右下
+            sb.setStyle("Single Box")
+            sb.setLinkedMap(m)
+            sb.setUnits(QgsUnitTypes.DistanceKilometers)
+            sb.setUnitsPerSegment(2.5)
+            sb.setNumberOfSegments(5)
+            sb.setNumberOfSegmentsLeft(0)
+            sb.setUnitLabel("km")
+            sb.update()
+            sb.attemptMove(QgsLayoutPoint(pw - 70, ph - 14, QgsUnitTypes.LayoutMillimeters))
+            layout.addLayoutItem(sb)
 
-        # 指北针 左上
-        arrow = None
-        for cand in ("NorthArrow_11.svg", "NorthArrow_02.svg"):
-            p = os.path.join(os.path.dirname(prefix), "Resources", "qgis", "svg", "arrows", cand)
-            if os.path.isfile(p):
-                arrow = p
-                break
-        arrow = arrow or _find_north_arrow_svg()
-        if arrow:
-            na = QgsLayoutItemPicture(layout)
-            na.setMode(QgsLayoutItemPicture.FormatSVG)
-            na.setPicturePath(arrow)
-            na.attemptResize(QgsLayoutSize(13, 24, QgsUnitTypes.LayoutMillimeters))
-            na.attemptMove(QgsLayoutPoint(4, 4, QgsUnitTypes.LayoutMillimeters))
-            layout.addLayoutItem(na)
+            arrow = None                               # 指北针 左上
+            for cand in ("NorthArrow_11.svg", "NorthArrow_02.svg"):
+                p = os.path.join(os.path.dirname(prefix), "Resources", "qgis", "svg", "arrows", cand)
+                if os.path.isfile(p):
+                    arrow = p
+                    break
+            arrow = arrow or _find_north_arrow_svg()
+            if arrow:
+                na = QgsLayoutItemPicture(layout)
+                na.setMode(QgsLayoutItemPicture.FormatSVG)
+                na.setPicturePath(arrow)
+                na.attemptResize(QgsLayoutSize(13, 24, QgsUnitTypes.LayoutMillimeters))
+                na.attemptMove(QgsLayoutPoint(4, 4, QgsUnitTypes.LayoutMillimeters))
+                layout.addLayoutItem(na)
 
-        # 图例 左下（4 项：源头水库 / 水库工程 / 县界 / 河流水系），白底框
-        lg = QgsLayoutItemLegend(layout)
-        lg.setLinkedMap(m)
-        lg.setAutoUpdateModel(False)
-        lg.setBackgroundEnabled(True)
-        lg.setBackgroundColor(QColor(255, 255, 255))
-        keep = ("核定水库", "水库工程", "县界", "河流水系")
-        rootg = lg.model().rootGroup()
-        for child in list(rootg.children()):
-            nm = child.name() if hasattr(child, "name") else ""
-            if nm not in keep:
-                rootg.removeChildNode(child)
-        lg.adjustBoxSize()
-        lg.attemptMove(QgsLayoutPoint(2, 258, QgsUnitTypes.LayoutMillimeters))
-        layout.addLayoutItem(lg)
+            lg = QgsLayoutItemLegend(layout)           # 图例 左下（核定水库/水库工程/县界/河流水系）
+            lg.setLinkedMap(m)
+            lg.setAutoUpdateModel(False)
+            lg.setBackgroundEnabled(True)
+            lg.setBackgroundColor(QColor(255, 255, 255))
+            keep = ("核定水库", "水库工程", "县界", "河流水系")
+            rootg = lg.model().rootGroup()
+            for child in list(rootg.children()):
+                nm = child.name() if hasattr(child, "name") else ""
+                if nm not in keep:
+                    rootg.removeChildNode(child)
+            lg.adjustBoxSize()
+            lg.attemptMove(QgsLayoutPoint(2, ph - 39, QgsUnitTypes.LayoutMillimeters))
+            layout.addLayoutItem(lg)
 
-        # —— 存 QGIS 工程 .qgz（用户 GUI 手动调整用：图层右键属性改配色/标注，布局管理器调版式）——
-        layout.setName(f"{county}水库工程位置分布图")
-        proj.layoutManager().addLayout(layout)
+            layout.setName(f"{county}水库工程位置分布图_{suffix}")
+            proj.layoutManager().addLayout(layout)
+
+            op = out_png.with_name(f"{out_png.stem}_{suffix}{out_png.suffix}")
+            op.parent.mkdir(parents=True, exist_ok=True)
+            exporter = QgsLayoutExporter(layout)
+            img = QgsLayoutExporter.ImageExportSettings()
+            img.dpi = 300
+            img.generateWorldFile = False
+            exporter.exportToImage(str(op), img)
+            exporter.exportToPdf(str(op.with_suffix(".pdf")), QgsLayoutExporter.PdfExportSettings())
+            print(f"[render] ✓ {op}")
+
+        for orient, suffix in (("portrait", "竖"), ("landscape", "横")):
+            build_and_export(orient, suffix)
+
+        # 存 QGIS 工程（含竖+横两布局，GUI 调整用）
         qgz = Path(layers["county"]).parent / f"{county}_水库工程位置分布图.qgz"
         proj.write(str(qgz))
         print(f"[render] ✓ QGIS 工程: {qgz}")
-
-        # —— 导出 ——
-        out_png.parent.mkdir(parents=True, exist_ok=True)
-        exporter = QgsLayoutExporter(layout)
-        img = QgsLayoutExporter.ImageExportSettings()
-        img.dpi = 300
-        img.generateWorldFile = False
-        exporter.exportToImage(str(out_png), img)
-        pdf = QgsLayoutExporter.PdfExportSettings()
-        exporter.exportToPdf(str(out_png.with_suffix(".pdf")), pdf)
-        print(f"[render] ✓ {out_png}")
-        print(f"[render] ✓ {out_png.with_suffix('.pdf')}")
     finally:
         qgs.exitQgis()
 
