@@ -7,6 +7,6 @@
     from hydraulic.qgis_fields import ...
 
 历史的 code_utils / config 模块（河流/流域编码映射）位于
-~/Dev/stations/web-stack/services/hydro-risk/lib/hydraulic/，
+~/Dev/services/hydro-risk/lib/hydraulic/，
 本仓库不依赖它们 — 故 __init__.py 不做任何 re-export。
 """
